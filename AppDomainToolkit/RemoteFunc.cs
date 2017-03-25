@@ -35,7 +35,7 @@ namespace AppDomainToolkit
 		/// <summary>
 		/// Invokes the target function.
 		/// </summary>
-		/// <typeparam name="T1">
+		/// <typeparam name="T">
 		/// First argument type.
 		/// </typeparam>
 		/// <typeparam name="TResult">
@@ -240,7 +240,7 @@ namespace AppDomainToolkit
 		/// <summary>
 		/// Invokes the target function.
 		/// </summary>
-		/// <param name="arg1">
+		/// <param name="arg">
 		/// The first argument.
 		/// </param>
 		/// <param name="toInvoke">

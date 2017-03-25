@@ -66,7 +66,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_MarshalObjectByRef_FourArg() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = new Test();
 				RemoteAction.Invoke(
 						context.Domain,
@@ -93,14 +93,14 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_MarshalObjectByRef_NoArguments() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				RemoteAction.Invoke(context.Domain, () => { });
 			}
 		}
 
 		[Fact]
 		public void Invoke_MarshalObjectByRef_OneArg() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = new Test();
 				RemoteAction.Invoke(
 						context.Domain,
@@ -114,7 +114,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_MarshalObjectByRef_ThreeArg() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = new Test();
 				RemoteAction.Invoke(
 						context.Domain,
@@ -136,7 +136,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_MarshalObjectByRef_TwoArg() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = new Test();
 				RemoteAction.Invoke(
 						context.Domain,
@@ -161,7 +161,7 @@ namespace AppDomainToolkit.UnitTests
 		public void Invoke_NullFunction() => Assert.Throws(
 				typeof(ArgumentNullException),
 				() => {
-					using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+					using (IAppDomainContext context = AppDomainContext.Create()) {
 						RemoteAction.Invoke(context.Domain, null);
 					}
 				});

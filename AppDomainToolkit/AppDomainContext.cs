@@ -20,7 +20,7 @@ namespace AppDomainToolkit
 		/// <returns>
 		/// A new AppDomainContext.
 		/// </returns>
-		public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Create()
+		public static IAppDomainContext Create()
 			=> AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Create();
 
 		/// <summary>
@@ -32,7 +32,7 @@ namespace AppDomainToolkit
 		/// <returns>
 		/// A new AppDomainContext.
 		/// </returns>
-		public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Create(AppDomainSetup setupInfo)
+		public static IAppDomainContext Create(AppDomainSetup setupInfo)
 			=> AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Create(setupInfo);
 
 		/// <summary>
@@ -40,7 +40,7 @@ namespace AppDomainToolkit
 		/// </summary>
 		/// <param name="domain">The domain to wrap in the context</param>
 		/// <returns></returns>
-		public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Wrap(AppDomain domain)
+		public static IAppDomainContext Wrap(AppDomain domain)
 			=> AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Wrap(domain);
 	}
 
@@ -165,9 +165,7 @@ namespace AppDomainToolkit
 		}
 
 
-		/// <summary>
-		/// Gets a unique ID assigned to the environment. Useful for dictionary keys.
-		/// </summary>
+		/// <inheritdoc />
 		public Guid UniqueId { get; private set; }
 
 		/// <inheritdoc />
@@ -180,9 +178,6 @@ namespace AppDomainToolkit
 		}
 
 		/// <inheritdoc />
-		public IAssemblyResolver AssemblyImporter { get; private set; }
-
-		/// <inheritdoc />
 		public IAssemblyResolver RemoteResolver {
 			get {
 				if (IsDisposed)
@@ -190,6 +185,9 @@ namespace AppDomainToolkit
 				return resolverProxy.RemoteObject;
 			}
 		}
+
+		/// <inheritdoc />
+		public IAssemblyResolver AssemblyImporter { get; private set; }
 
 		/// <inheritdoc />
 		/// <remarks>
@@ -204,9 +202,6 @@ namespace AppDomainToolkit
 				return rValue;
 			}
 		}
-
-		/// <inheritdoc />
-		public bool IsDisposed { get; private set; }
 
 
 		/// <inheritdoc />
@@ -265,6 +260,10 @@ namespace AppDomainToolkit
 			resolverProxy.RemoteObject.LoadMethod = previousLoadMethod;
 			return targets;
 		}
+
+
+		/// <inheritdoc />
+		public bool IsDisposed { get; private set; }
 
 
 		/// <inheritdoc />

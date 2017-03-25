@@ -28,7 +28,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_EmptyFunction() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				int actual = RemoteFunc.Invoke(context.Domain, () => { return 1; });
 				Assert.Equal(1, actual);
 			}
@@ -82,14 +82,14 @@ namespace AppDomainToolkit.UnitTests
 		public void Invoke_NullFunction() => Assert.Throws(
 				typeof(ArgumentNullException),
 				() => {
-					using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+					using (IAppDomainContext context = AppDomainContext.Create()) {
 						int actual = RemoteFunc.Invoke<int>(context.Domain, null);
 					}
 				});
 
 		[Fact]
 		public void Invoke_Serializable_FourArg() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = RemoteFunc.Invoke(
 						context.Domain,
 						10,
@@ -112,7 +112,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_Serializable_NoArguments() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = RemoteFunc.Invoke(
 						context.Domain,
 						() => { return new Test {Value1 = 10}; });
@@ -124,7 +124,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_Serializable_OneArg() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = RemoteFunc.Invoke(
 						context.Domain,
 						10,
@@ -137,7 +137,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_Serializable_ThreeArg() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = RemoteFunc.Invoke(
 						context.Domain,
 						10,
@@ -154,7 +154,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Invoke_Serializable_TwoArg() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				Test actual = RemoteFunc.Invoke(
 						context.Domain,
 						10,

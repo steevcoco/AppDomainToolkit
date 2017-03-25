@@ -52,7 +52,7 @@ namespace AppDomainToolkit.UnitTests
 				PrivateBinPath = workingDir
 			};
 
-			AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> target = AppDomainContext.Create(setupInfo);
+			IAppDomainContext target = AppDomainContext.Create(setupInfo);
 
 			Assert.NotNull(target);
 			Assert.NotNull(target.Domain);
@@ -68,8 +68,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Create_NoApplicationNameSupplied_WrappedDomain() {
-			AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> target =
-					AppDomainContext.Wrap(AppDomain.CurrentDomain);
+			IAppDomainContext target = AppDomainContext.Wrap(AppDomain.CurrentDomain);
 
 			Assert.NotNull(target);
 			Assert.NotNull(target.Domain);
@@ -83,7 +82,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Create_NoArgs_ValidContext() {
-			AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> target = AppDomainContext.Create();
+			IAppDomainContext target = AppDomainContext.Create();
 
 			Assert.NotNull(target);
 			Assert.NotNull(target.Domain);
@@ -96,7 +95,7 @@ namespace AppDomainToolkit.UnitTests
 		public void Create_NullAppDomainSetupInfo() => Assert.Throws(
 				typeof(ArgumentNullException),
 				() => {
-					AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create(null);
+					IAppDomainContext context = AppDomainContext.Create(null);
 				});
 
 		[Fact]
@@ -108,7 +107,7 @@ namespace AppDomainToolkit.UnitTests
 				PrivateBinPath = workingDir
 			};
 
-			AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> target = AppDomainContext.Create(setupInfo);
+			IAppDomainContext target = AppDomainContext.Create(setupInfo);
 
 			Assert.NotNull(target);
 			Assert.NotNull(target.Domain);
@@ -126,7 +125,7 @@ namespace AppDomainToolkit.UnitTests
 		public void Dispose_DomainProperty() => Assert.Throws(
 				typeof(ObjectDisposedException),
 				() => {
-					AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> target = AppDomainContext.Create();
+					IAppDomainContext target = AppDomainContext.Create();
 					target.Dispose();
 
 					Assert.True(target.IsDisposed);
@@ -137,7 +136,7 @@ namespace AppDomainToolkit.UnitTests
 		public void Dispose_LoadedAssembliesProperty() => Assert.Throws(
 				typeof(ObjectDisposedException),
 				() => {
-					AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> target = AppDomainContext.Create();
+					IAppDomainContext target = AppDomainContext.Create();
 					target.Dispose();
 
 					Assert.True(target.IsDisposed);
@@ -148,7 +147,7 @@ namespace AppDomainToolkit.UnitTests
 		public void Dispose_RemoteResolverPropery() => Assert.Throws(
 				typeof(ObjectDisposedException),
 				() => {
-					AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> target = AppDomainContext.Create();
+					IAppDomainContext target = AppDomainContext.Create();
 					target.Dispose();
 
 					Assert.True(target.IsDisposed);
@@ -157,7 +156,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void Dispose_WithUsingClause() {
-			AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> target;
+			IAppDomainContext target;
 			using (target = AppDomainContext.Create()) {
 				Assert.NotNull(target);
 				Assert.NotNull(target.Domain);
@@ -172,7 +171,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void FindByCodeBase_NoRefAssembly_LoadFrom() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				Uri codebaseUri = new Uri(targetPath);
 				context.LoadAssembly(LoadMethod.LoadFrom, targetPath);
@@ -184,14 +183,14 @@ namespace AppDomainToolkit.UnitTests
 		public void FindByCodeBase_NullArgument() => Assert.Throws(
 				typeof(ArgumentNullException),
 				() => {
-					using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+					using (IAppDomainContext context = AppDomainContext.Create()) {
 						context.FindByCodeBase(null);
 					}
 				});
 
 		[Fact]
 		public void FindByFullName_NoRefAssembly_LoadFrom() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				IAssemblyTarget target = context.LoadAssembly(LoadMethod.LoadFrom, targetPath);
 				Assert.NotNull(context.FindByFullName(target.AssemblyName.FullName));
@@ -202,14 +201,14 @@ namespace AppDomainToolkit.UnitTests
 		public void FindByFullName_NullArgument() => Assert.Throws(
 				typeof(ArgumentException),
 				() => {
-					using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+					using (IAppDomainContext context = AppDomainContext.Create()) {
 						context.FindByFullName(null);
 					}
 				});
 
 		[Fact]
 		public void FindByLocation_NoRefAssembly_LoadFrom() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				IAssemblyTarget target = context.LoadAssembly(LoadMethod.LoadFrom, targetPath);
 				Assert.NotNull(context.FindByLocation(target.Location));
@@ -220,14 +219,14 @@ namespace AppDomainToolkit.UnitTests
 		public void FindByLocation_NullArgument() => Assert.Throws(
 				typeof(ArgumentException),
 				() => {
-					using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+					using (IAppDomainContext context = AppDomainContext.Create()) {
 						context.FindByLocation(null);
 					}
 				});
 
 		[Fact]
 		public void LoadAssembly_NoRefAssembly_LoadBitsNoPdbSpecified() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				Uri codebaseUri = new Uri(targetPath);
 				IAssemblyTarget target = context.LoadAssembly(LoadMethod.LoadBits, targetPath);
@@ -237,7 +236,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadAssembly_NoRefAssembly_LoadBitsPdbSpecified() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				Uri codebaseUri = new Uri(targetPath);
 				IAssemblyTarget target = context.LoadAssembly(
@@ -250,7 +249,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadAssembly_NoRefAssembly_LoadBitsWrongPdbPathSpecified() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				string pdbPath =
 						Path.ChangeExtension(
@@ -267,7 +266,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadAssembly_NoRefAssembly_LoadFile() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				Uri codebaseUri = new Uri(targetPath);
 				context.LoadAssembly(LoadMethod.LoadFile, targetPath);
@@ -277,7 +276,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadAssembly_NoRefAssembly_LoadFrom() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				Uri codebaseUri = new Uri(targetPath);
 				context.LoadAssembly(LoadMethod.LoadFrom, targetPath);
@@ -287,7 +286,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadAssemblyWithReferences_InternalReferences_LoadBitsNoPdbSpecified() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				int prevNumAssemblies = context.LoadedAssemblies.Count();
 
 				// Add the correct resolver path for the test dir.
@@ -304,7 +303,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadAssemblyWithReferences_InternalReferences_LoadFile() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				int prevNumAssemblies = context.LoadedAssemblies.Count();
 
 				// Add the correct resolver path for the test dir.
@@ -322,7 +321,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadAssemblyWithReferences_InternalReferences_LoadFrom() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				int prevNumAssemblies = context.LoadedAssemblies.Count();
 
 				// Add the correct resolver path for the test dir.
@@ -340,7 +339,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadTarget_NoRefAssembly_LoadBits() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				Assembly assembly = Assembly.LoadFile(targetPath);
 				IAssemblyTarget target = AssemblyTarget.FromAssembly(assembly);
@@ -357,7 +356,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadTarget_NoRefAssembly_LoadFile() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				Assembly assembly = Assembly.LoadFile(targetPath);
 				IAssemblyTarget target = AssemblyTarget.FromAssembly(assembly);
@@ -374,7 +373,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadTarget_NoRefAssembly_LoadFrom() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
 				Assembly assembly = Assembly.LoadFile(targetPath);
 				IAssemblyTarget target = AssemblyTarget.FromAssembly(assembly);
@@ -391,7 +390,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadTargetWithReferences_InternalReferences_LoadBitsNoPdbSpecified() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				int prevNumAssemblies = context.LoadedAssemblies.Count();
 
 				// Add the correct resolver path for the test dir.
@@ -411,7 +410,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadTargetWithReferences_InternalReferences_LoadFile() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				int prevNumAssemblies = context.LoadedAssemblies.Count();
 
 				// Add the correct resolver path for the test dir.
@@ -432,7 +431,7 @@ namespace AppDomainToolkit.UnitTests
 
 		[Fact]
 		public void LoadTargetWithReferences_InternalReferences_LoadFrom() {
-			using (AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> context = AppDomainContext.Create()) {
+			using (IAppDomainContext context = AppDomainContext.Create()) {
 				int prevNumAssemblies = context.LoadedAssemblies.Count();
 
 				// Add the correct resolver path for the test dir.

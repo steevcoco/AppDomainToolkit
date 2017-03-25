@@ -32,8 +32,7 @@ namespace AppDomainToolkit
 		/// Initializes a new instance of the PathBasedAssemblyResolver class. Exists for MarshalByRefObject
 		/// remoting into app domains.
 		/// </summary>
-		public PathBasedAssemblyResolver()
-			: this(null, LoadMethod.LoadFrom) {}
+		public PathBasedAssemblyResolver() : this(null) {}
 
 		/// <summary>
 		/// Initializes a new instance of the AssemblyResolver class. A default instance of this class will resolve
@@ -58,6 +57,7 @@ namespace AppDomainToolkit
 		/// <inheritdoc />
 		public LoadMethod LoadMethod { get; set; }
 
+		/// <inheritdoc />
 		public string ApplicationBase {
 			get { return applicationBase; }
 			set {
@@ -66,6 +66,7 @@ namespace AppDomainToolkit
 			}
 		}
 
+		/// <inheritdoc />
 		public string PrivateBinPath {
 			get { return privateBinPath; }
 			set {

@@ -29,13 +29,13 @@ namespace AppDomainToolkit
 		/// <summary>
 		/// Invokes the target action.
 		/// </summary>
-		/// <typeparam name="T1">
+		/// <typeparam name="T">
 		/// First argument type.
 		/// </typeparam>
 		/// <param name="domain">
 		/// The domain to execute the action in.
 		/// </param>
-		/// <param name="arg1">
+		/// <param name="arg">
 		/// The first argument.
 		/// </param>
 		/// <param name="toInvoke">
@@ -164,6 +164,10 @@ namespace AppDomainToolkit
 			proxy.RemoteObject.Invoke(arg1, arg2, arg3, arg4, toInvoke);
 		}
 
+		/// <summary>
+		/// Invokes the <see cref="Action"/>.
+		/// </summary>
+		/// <param name="toInvoke">Not null.</param>
 		public void Invoke(Action toInvoke) {
 			if (toInvoke == null)
 				throw new ArgumentNullException(nameof(toInvoke));

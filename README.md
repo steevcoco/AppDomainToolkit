@@ -1,15 +1,6 @@
 AppDomain Toolkit
 =================
 
-CHANGES IN THIS FORK
---------------------
-
- - Added ReflectionOnly LoadMethods.
- - Refactored IAssemblyTarget to hold the actual AssemblyName object instead of just the (string) FullName.
-
-From the original:
-
-
 SUMMARY
 -------
 Anyone whose ever had to deal with loading Assemblies using standard .NET reflection facilities understands

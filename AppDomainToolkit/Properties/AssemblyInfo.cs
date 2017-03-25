@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("AppDomain Toolkit")]
+[assembly: AssemblyTitle("AppDomain Toolkit - steevcoco Fork")]
 [assembly: AssemblyDescription("A small toolkit for manipulating .NET application domains.")]
 [assembly: AssemblyProduct("AppDomainToolkit")]
 [assembly: AssemblyCopyright("Copyright © Jeremy Duvall, 2013")]
@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 // Versioning
 
-[assembly: AssemblyVersion("1.0.4.1")]
+[assembly: AssemblyVersion("1.1.4.1")]
 
 // Unit tests.
 

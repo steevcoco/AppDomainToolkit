@@ -10,6 +10,11 @@ namespace AppDomainToolkit
 	public interface IAppDomainContext : IIsDisposable
 	{
 		/// <summary>
+		/// Gets a unique ID assigned to the environment. Useful for dictionary keys.
+		/// </summary>
+		Guid UniqueId { get; }
+
+		/// <summary>
 		/// Gets the contained application domain.
 		/// </summary>
 		AppDomain Domain { get; }
