@@ -1,377 +1,295 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
+
 namespace AppDomainToolkit
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
+	/// <summary>
+	/// Loads assemblies into the contained application domain. Just a no-hassle wrapper
+	/// for creating default instances of
+	/// <see cref="AppDomainContext{TAssemblyTargetLoader,TAssemblyResolver}" />
+	/// </summary>
+	public static class AppDomainContext
+	{
+		/// <summary>
+		/// Creates a new instance of the AppDomainContext class.
+		/// </summary>
+		/// <returns>
+		/// A new AppDomainContext.
+		/// </returns>
+		public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Create()
+			=> AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Create();
 
-    /// <summary>
-    /// Loads assemblies into the contained application domain.<br/>
-    /// No-hassle wrapper for creating default instances of <see cref="AppDomainToolkit.AppDomainContext&lt;TAssemblyTargetLoader, TAssemblyResolver&gt;" />
-    /// </summary>
-    public sealed class AppDomainContext 
-    {
-        /// <summary>
-        /// Creates a new instance of the AppDomainContext class.
-        /// </summary>
-        /// <returns>
-        /// A new AppDomainContext.
-        /// </returns>
-        public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Create() { return AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Create<AssemblyTargetLoader, PathBasedAssemblyResolver>(); }
-        /// <summary>
-        /// Creates a new instance of the AppDomainContext class.
-        /// </summary>
-        /// <param name="setupInfo">
-        /// The setup info.
-        /// </param>
-        /// <returns>
-        /// A new AppDomainContext.
-        /// </returns>
-        public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Create(AppDomainSetup setupInfo) { return AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Create<AssemblyTargetLoader, PathBasedAssemblyResolver>(setupInfo); }
+		/// <summary>
+		/// Creates a new instance of the AppDomainContext class.
+		/// </summary>
+		/// <param name="setupInfo">
+		/// The setup info.
+		/// </param>
+		/// <returns>
+		/// A new AppDomainContext.
+		/// </returns>
+		public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Create(AppDomainSetup setupInfo)
+			=> AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Create(setupInfo);
 
-        /// <summary>
-        /// Creates a new instance of the AppDomainContext class.
-        /// </summary>
-        /// <param name="domain">The domain to wrap in the context</param>
-        /// <returns></returns>
-        public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Wrap(AppDomain domain)
-        {
-            return AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Wrap(domain);
-        }
-    }
+		/// <summary>
+		/// Creates a new instance of the AppDomainContext class.
+		/// </summary>
+		/// <param name="domain">The domain to wrap in the context</param>
+		/// <returns></returns>
+		public static AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver> Wrap(AppDomain domain)
+			=> AppDomainContext<AssemblyTargetLoader, PathBasedAssemblyResolver>.Wrap(domain);
+	}
 
-    /// <summary>
-    /// Loads assemblies into the contained application domain.
-    /// </summary>
-    public sealed class AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> : IAppDomainContext
-        where TAssemblyTargetLoader : MarshalByRefObject, IAssemblyTargetLoader, new()
-        where TAssemblyResolver : MarshalByRefObject, IAssemblyResolver, new()
-    {
-        #region Fields & Constants
 
-        private readonly DisposableAppDomain wrappedDomain;
-        private readonly Remote<TAssemblyTargetLoader> loaderProxy;
-        private readonly Remote<TAssemblyResolver> resolverProxy;
+	/// <summary>
+	/// Loads assemblies into the contained application domain.
+	/// </summary>
+	public sealed class AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> : IAppDomainContext
+		where TAssemblyTargetLoader : MarshalByRefObject, IAssemblyTargetLoader, new()
+		where TAssemblyResolver : MarshalByRefObject, IAssemblyResolver, new()
+	{
+		private static AppDomain createDomain(AppDomainSetup setup, string name)
+			=> AppDomain.CreateDomain(name, null, setup);
 
-        #endregion
 
-        #region Constructors & Destructors
+		/// <summary>
+		/// Creates a new instance of the AppDomainContext class.
+		/// </summary>
+		/// <returns>
+		/// A new AppDomainContext.
+		/// </returns>
+		public static AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> Create() {
+			Guid guid = Guid.NewGuid();
+			//string rootDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			string rootDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+			AppDomainSetup setupInfo = new AppDomainSetup {
+				ApplicationName = "Temp-Domain-" + guid,
+				ApplicationBase = rootDir,
+				PrivateBinPath = rootDir
+			};
+			return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(setupInfo) { UniqueId = guid };
+		}
 
-        /// <summary>
-        /// Initializes a new instance of the AppDomainAssemblyLoader class. The assembly environment will create
-        /// a new application domain with the location of the currently executing assembly as the application base. It
-        /// will also add that root directory to the assembly resolver's path in order to properly load a remotable
-        /// AssemblyLoader object into context. From here, add whatever assembly probe paths you wish in order to
-        /// resolve remote proxies, or extend this class if you desire more specific behavior.
-        /// </summary>
-        /// <param name="setupInfo">
-        /// The setup information.
-        /// </param>
-        private AppDomainContext(AppDomainSetup setupInfo)
-            : this(setupInfo, CreateDomain)
-        {
-        }
+		/// <summary>
+		/// Creates a new instance of the AppDomainContext class.
+		/// </summary>
+		/// <param name="setupInfo">
+		/// The setup info.
+		/// </param>
+		/// <returns>
+		/// A new AppDomainContext.
+		/// </returns>
+		public static AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> Create(AppDomainSetup setupInfo) {
+			if (setupInfo == null)
+				throw new ArgumentNullException(nameof(setupInfo));
+			Guid guid = Guid.NewGuid();
+			setupInfo.ApplicationName
+				= string.IsNullOrEmpty(setupInfo.ApplicationName)
+					? "Temp-Domain-" + guid
+					: setupInfo.ApplicationName;
+			return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(setupInfo) { UniqueId = guid };
+		}
 
-        /// <summary>
-        /// Initializes a new instance of the AppDomainContext class. The new AppDomainContext will wrap the given domain
-        /// </summary>
-        /// <param name="domain"></param>
-        private AppDomainContext(AppDomain domain)
-            : this(domain.SetupInformation, (_, __) => domain)
-        {
-        }
+		/// <summary>
+		/// Creates a new instance of the AppDomainContext class.
+		/// </summary>
+		/// <param name="domain">The appdomain to wrap.</param>
+		/// <returns>A new AppDomainContext.</returns>
+		/// <exception cref="ArgumentNullException"></exception>
+		public static AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> Wrap(AppDomain domain) {
+			if (domain == null)
+				throw new ArgumentNullException(nameof(domain));
+			return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(domain);
+		}
 
-        private AppDomainContext(AppDomainSetup setupInfo, Func<AppDomainSetup, string, AppDomain> createDomain)
-        {
-            this.UniqueId = Guid.NewGuid();
-            this.AssemblyImporter = new TAssemblyResolver 
-            {
-                ApplicationBase = setupInfo.ApplicationBase,
-                PrivateBinPath = setupInfo.PrivateBinPath
-            };
 
-            // Add some root directories to resolve some required assemblies
-            // Create the new domain and wrap it for disposal.
-            this.wrappedDomain = new DisposableAppDomain(createDomain(setupInfo, UniqueId.ToString()));
+		private readonly Remote<TAssemblyTargetLoader> loaderProxy;
+		private readonly Remote<TAssemblyResolver> resolverProxy;
 
-            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyImporter.Resolve;
 
-            // Create remotes
-            this.loaderProxy = Remote<TAssemblyTargetLoader>.CreateProxy(this.wrappedDomain);
-            this.resolverProxy = Remote<TAssemblyResolver>.CreateProxy(this.wrappedDomain);
+		private readonly DisposableAppDomain wrappedDomain;
 
-            // Assign the resolver in the other domain (just to be safe)
-            RemoteAction.Invoke(
-                this.wrappedDomain.Domain,
-                this.resolverProxy.RemoteObject,
-                (resolver) =>
-                {
-                    AppDomain.CurrentDomain.AssemblyResolve += resolver.Resolve;
-                });
 
-            // Assign proper paths to the remote resolver
-            this.resolverProxy.RemoteObject.ApplicationBase = setupInfo.ApplicationBase;
-            this.resolverProxy.RemoteObject.PrivateBinPath = setupInfo.PrivateBinPath;
+		/// <summary>
+		/// Initializes a new instance of the AppDomainAssemblyLoader class. The assembly environment will create
+		/// a new application domain with the location of the currently executing assembly as the application base. It
+		/// will also add that root directory to the assembly resolver's path in order to properly load a remotable
+		/// AssemblyLoader object into context. From here, add whatever assembly probe paths you wish in order to
+		/// resolve remote proxies, or extend this class if you desire more specific behavior.
+		/// </summary>
+		/// <param name="setupInfo">
+		/// The setup information.
+		/// </param>
+		private AppDomainContext(AppDomainSetup setupInfo)
+			: this(setupInfo, AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>.createDomain) {}
 
-            this.IsDisposed = false;
-        }
+		/// <summary>
+		/// Initializes a new instance of the AppDomainContext class. The new AppDomainContext will wrap the given domain
+		/// </summary>
+		/// <param name="domain"></param>
+		private AppDomainContext(AppDomain domain)
+			: this(domain.SetupInformation, (_, __) => domain) {}
 
-        private static AppDomain CreateDomain(AppDomainSetup setup, string name)
-        {
-            return AppDomain.CreateDomain(name, null, setup);
-        }
+		private AppDomainContext(AppDomainSetup setupInfo, Func<AppDomainSetup, string, AppDomain> createDomain) {
+			UniqueId = Guid.NewGuid();
+			AssemblyImporter = new TAssemblyResolver {
+				ApplicationBase = setupInfo.ApplicationBase,
+				PrivateBinPath = setupInfo.PrivateBinPath
+			};
 
-        /// <summary>
-        /// Finalizes an instance of the AppDomainContext class.
-        /// </summary>
-        ~AppDomainContext()
-        {
-            this.OnDispose(false);
-            GC.SuppressFinalize(this);
-        }
+			// Add some root directories to resolve some required assemblies
+			// Create the new domain and wrap it for disposal.
+			wrappedDomain = new DisposableAppDomain(createDomain(setupInfo, UniqueId.ToString()));
 
-        #endregion
+			AppDomain.CurrentDomain.AssemblyResolve += AssemblyImporter.Resolve;
 
-        #region Properties
+			// Create remotes
+			loaderProxy = Remote<TAssemblyTargetLoader>.CreateProxy(wrappedDomain);
+			resolverProxy = Remote<TAssemblyResolver>.CreateProxy(wrappedDomain);
 
-        /// <inheritdoc />
-        public AppDomain Domain
-        {
-            get
-            {
-                if (this.IsDisposed)
-                {
-                    throw new ObjectDisposedException("The AppDomain has been unloaded or disposed!");
-                }
+			// Assign the resolver in the other domain (just to be safe)
+			RemoteAction.Invoke(
+					wrappedDomain.Domain,
+					resolverProxy.RemoteObject,
+					resolver => { AppDomain.CurrentDomain.AssemblyResolve += resolver.Resolve; });
 
-                return this.wrappedDomain.Domain;
-            }
-        }
+			// Assign proper paths to the remote resolver
+			resolverProxy.RemoteObject.ApplicationBase = setupInfo.ApplicationBase;
+			resolverProxy.RemoteObject.PrivateBinPath = setupInfo.PrivateBinPath;
 
-        /// <summary>
-        /// Gets a unique ID assigned to the environment. Useful for dictionary keys.
-        /// </summary>
-        public Guid UniqueId { get; private set; }
+			IsDisposed = false;
+		}
 
-        /// <inheritdoc />
-        public IAssemblyResolver AssemblyImporter { get; private set; }
 
-        /// <inheritdoc />
-        public IAssemblyResolver RemoteResolver
-        {
-            get
-            {
-                if (this.IsDisposed)
-                {
-                    throw new ObjectDisposedException("The AppDomain has been unloaded or disposed!");
-                }
+		/// <summary>
+		/// Gets a unique ID assigned to the environment. Useful for dictionary keys.
+		/// </summary>
+		public Guid UniqueId { get; private set; }
 
-                return this.resolverProxy.RemoteObject;
-            }
-        }
+		/// <inheritdoc />
+		public AppDomain Domain {
+			get {
+				if (IsDisposed)
+					throw new ObjectDisposedException("The AppDomain has been unloaded or disposed!");
+				return wrappedDomain.Domain;
+			}
+		}
 
-        /// <inheritdoc />
-        /// <remarks>
-        /// This property hits the remote AppDomain each time you ask for it, so don't call this in a
-        /// tight loop unless you like slow code.
-        /// </remarks>
-        public IEnumerable<IAssemblyTarget> LoadedAssemblies
-        {
-            get
-            {
-                if (this.IsDisposed)
-                {
-                    throw new ObjectDisposedException("The AppDomain has been unloaded or disposed!");
-                }
+		/// <inheritdoc />
+		public IAssemblyResolver AssemblyImporter { get; private set; }
 
-                var rValue = this.loaderProxy.RemoteObject.GetAssemblies();
-                return rValue;
-            }
-        }
+		/// <inheritdoc />
+		public IAssemblyResolver RemoteResolver {
+			get {
+				if (IsDisposed)
+					throw new ObjectDisposedException("The AppDomain has been unloaded or disposed!");
+				return resolverProxy.RemoteObject;
+			}
+		}
 
-        /// <inheritdoc />
-        public bool IsDisposed { get; private set; }
+		/// <inheritdoc />
+		/// <remarks>
+		/// This property hits the remote AppDomain each time you ask for it, so don't call this in a
+		/// tight loop unless you like slow code.
+		/// </remarks>
+		public IEnumerable<IAssemblyTarget> LoadedAssemblies {
+			get {
+				if (IsDisposed)
+					throw new ObjectDisposedException("The AppDomain has been unloaded or disposed!");
+				IAssemblyTarget[] rValue = loaderProxy.RemoteObject.GetAssemblies();
+				return rValue;
+			}
+		}
 
-        #endregion
+		/// <inheritdoc />
+		public bool IsDisposed { get; private set; }
 
-        #region Public Methods
 
-        /// <summary>
-        /// Creates a new instance of the AppDomainContext class.
-        /// </summary>
-        /// <returns>
-        /// A new AppDomainContext.
-        /// </returns>
-        public static AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> Create<TNewAssemblyTargetLoader, TNewAssemblyResolver>()
-            where TNewAssemblyTargetLoader : MarshalByRefObject, TAssemblyTargetLoader, IAssemblyTargetLoader, new()
-            where TNewAssemblyResolver : MarshalByRefObject, TAssemblyResolver, IAssemblyResolver, new()
-        {
-            var guid = Guid.NewGuid();
+		/// <inheritdoc />
+		public IAssemblyTarget FindByCodeBase(Uri codebaseUri) {
+			if (codebaseUri == null)
+				throw new ArgumentNullException(nameof(codebaseUri));
+			return LoadedAssemblies.FirstOrDefault(x => x.CodeBase.Equals(codebaseUri));
+		}
 
-            //string rootDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string rootDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+		/// <inheritdoc />
+		public IAssemblyTarget FindByLocation(string location) {
+			if (string.IsNullOrEmpty(location))
+				throw new ArgumentException("Location cannot be null or empty");
+			return LoadedAssemblies.FirstOrDefault(x => x.Location.Equals(location));
+		}
 
-            var setupInfo = new AppDomainSetup()
-            {
-                ApplicationName = "Temp-Domain-" + guid,
-                ApplicationBase = rootDir,
-                PrivateBinPath = rootDir
-            };
+		/// <inheritdoc />
+		public IAssemblyTarget FindByFullName(string fullname) {
+			if (string.IsNullOrEmpty(fullname))
+				throw new ArgumentException("Full name cannot be null or empty!");
+			return LoadedAssemblies.FirstOrDefault(x => x.AssemblyName.FullName.Equals(fullname));
+		}
 
-            return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(setupInfo) { UniqueId = guid };
-        }
+		/// <inheritdoc />
+		public IAssemblyTarget LoadTarget(LoadMethod loadMethod, IAssemblyTarget target)
+			=> LoadAssembly(loadMethod, target.CodeBase.LocalPath);
 
-        /// <summary>
-        /// Creates a new instance of the AppDomainContext class.
-        /// </summary>
-        /// <param name="setupInfo">
-        /// The setup info.
-        /// </param>
-        /// <returns>
-        /// A new AppDomainContext.
-        /// </returns>
-        public static AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> Create<TNewAssemblyTargetLoader, TNewAssemblyResolver>(AppDomainSetup setupInfo)
-            where TNewAssemblyTargetLoader : MarshalByRefObject, TAssemblyTargetLoader, IAssemblyTargetLoader, new()
-            where TNewAssemblyResolver : MarshalByRefObject, TAssemblyResolver, IAssemblyResolver, new()
-        {
-            if (setupInfo == null)
-            {
-                throw new ArgumentNullException("setupInfo");
-            }
+		/// <inheritdoc />
+		public IEnumerable<IAssemblyTarget> LoadTargetWithReferences(LoadMethod loadMethod, IAssemblyTarget target)
+			=> LoadAssemblyWithReferences(loadMethod, target.CodeBase.LocalPath);
 
-            var guid = Guid.NewGuid();
-            setupInfo.ApplicationName = string.IsNullOrEmpty(setupInfo.ApplicationName) ?
-                "Temp-Domain-" + guid.ToString() :
-                setupInfo.ApplicationName;
+		/// <inheritdoc />
+		/// <remarks>
+		/// In order to ensure that the assembly is loaded the way the caller expects, the LoadMethod property of
+		/// the remote domain assembly resolver will be temporarily set to the value of <paramref name="loadMethod" />.
+		/// It will be reset to the original value after the load is complete.
+		/// </remarks>
+		public IAssemblyTarget LoadAssembly(LoadMethod loadMethod, string path, string pdbPath = null) {
+			LoadMethod previousLoadMethod = resolverProxy.RemoteObject.LoadMethod;
+			resolverProxy.RemoteObject.LoadMethod = loadMethod;
+			IAssemblyTarget target = loaderProxy.RemoteObject.LoadAssembly(loadMethod, path, pdbPath);
+			resolverProxy.RemoteObject.LoadMethod = previousLoadMethod;
+			return target;
+		}
 
-            return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(setupInfo) { UniqueId = guid };
-        }
+		/// <inheritdoc />
+		/// <remarks>
+		/// In order to ensure that the assembly is loaded the way the caller expects, the LoadMethod property of
+		/// the remote domain assembly resolver will be temporarily set to the value of <paramref name="loadMethod" />.
+		/// It will be reset to the original value after the load is complete.
+		/// </remarks>
+		public IEnumerable<IAssemblyTarget> LoadAssemblyWithReferences(LoadMethod loadMethod, string path) {
+			LoadMethod previousLoadMethod = resolverProxy.RemoteObject.LoadMethod;
+			resolverProxy.RemoteObject.LoadMethod = loadMethod;
+			IList<IAssemblyTarget> targets = loaderProxy.RemoteObject.LoadAssemblyWithReferences(loadMethod, path);
+			resolverProxy.RemoteObject.LoadMethod = previousLoadMethod;
+			return targets;
+		}
 
-        /// <summary>
-        /// Creates a new instance of the AppDomainContext class.
-        /// </summary>
-        /// <param name="domain">The appdomain to wrap.</param>
-        /// <returns>A new AppDomainContext.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> Wrap(AppDomain domain)
-        {
-            if (domain == null)
-            {
-                throw new ArgumentNullException("domain");
-            }
 
-            return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(domain);
-        }
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            this.OnDispose(true);
-        }
+		/// <inheritdoc />
+		public void Dispose()
+			=> onDispose(true);
 
-        /// <inheritdoc />
-        public IAssemblyTarget FindByCodeBase(Uri codebaseUri)
-        {
-            if (codebaseUri == null)
-            {
-                throw new ArgumentNullException("codebaseUri");
-            }
+		private void onDispose(bool disposing) {
+			if (disposing) {
+				if (!IsDisposed) {
+					if (!wrappedDomain.IsDisposed)
+						wrappedDomain.Dispose();
+					if (!loaderProxy.IsDisposed)
+						loaderProxy.Dispose();
+					AssemblyImporter = null;
+					GC.SuppressFinalize(this);
+				}
+			}
+			IsDisposed = true;
+		}
 
-            return this.LoadedAssemblies.FirstOrDefault(x => x.CodeBase.Equals(codebaseUri));
-        }
-
-        /// <inheritdoc />
-        public IAssemblyTarget FindByLocation(string location)
-        {
-            if (string.IsNullOrEmpty(location))
-            {
-                throw new ArgumentException("Location cannot be null or empty");
-            }
-
-            return this.LoadedAssemblies.FirstOrDefault(x => x.Location.Equals(location));
-        }
-
-        /// <inheritdoc />
-        public IAssemblyTarget FindByFullName(string fullname)
-        {
-            if (string.IsNullOrEmpty(fullname))
-            {
-                throw new ArgumentException("Full name cannot be null or empty!");
-            }
-
-            return this.LoadedAssemblies.FirstOrDefault(x => x.FullName.Equals(fullname));
-        }
-
-        /// <inheritdoc />
-        public IAssemblyTarget LoadTarget(LoadMethod loadMethod, IAssemblyTarget target)
-        {
-            return this.LoadAssembly(loadMethod, target.CodeBase.LocalPath);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IAssemblyTarget> LoadTargetWithReferences(LoadMethod loadMethod, IAssemblyTarget target)
-        {
-            return this.LoadAssemblyWithReferences(loadMethod, target.CodeBase.LocalPath);
-        }
-
-        /// <inheritdoc/>
-        /// <remarks>
-        /// In order to ensure that the assembly is loaded the way the caller expects, the LoadMethod property of
-        /// the remote domain assembly resolver will be temporarily set to the value of <paramref name="loadMethod"/>.
-        /// It will be reset to the original value after the load is complete.
-        /// </remarks>
-        public IAssemblyTarget LoadAssembly(LoadMethod loadMethod, string path, string pdbPath = null)
-        {
-            var previousLoadMethod = this.resolverProxy.RemoteObject.LoadMethod;
-            this.resolverProxy.RemoteObject.LoadMethod = loadMethod;
-            var target = this.loaderProxy.RemoteObject.LoadAssembly(loadMethod, path, pdbPath);
-            this.resolverProxy.RemoteObject.LoadMethod = previousLoadMethod;
-            return target;
-        }
-
-        /// <inheritdoc />
-        /// <remarks>
-        /// In order to ensure that the assembly is loaded the way the caller expects, the LoadMethod property of
-        /// the remote domain assembly resolver will be temporarily set to the value of <paramref name="loadMethod"/>.
-        /// It will be reset to the original value after the load is complete.
-        /// </remarks>
-        public IEnumerable<IAssemblyTarget> LoadAssemblyWithReferences(LoadMethod loadMethod, string path)
-        {
-            var previousLoadMethod = this.resolverProxy.RemoteObject.LoadMethod;
-            this.resolverProxy.RemoteObject.LoadMethod = loadMethod;
-            var targets = this.loaderProxy.RemoteObject.LoadAssemblyWithReferences(loadMethod, path);
-            this.resolverProxy.RemoteObject.LoadMethod = previousLoadMethod;
-            return targets;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void OnDispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!this.IsDisposed)
-                {
-                    if (!this.wrappedDomain.IsDisposed)
-                    {
-                        this.wrappedDomain.Dispose();
-                    }
-
-                    if (!this.loaderProxy.IsDisposed)
-                    {
-                        this.loaderProxy.Dispose();
-                    }
-
-                    this.AssemblyImporter = null;
-                }
-            }
-
-            this.IsDisposed = true;
-        }
-
-        #endregion
-    }
+		/// <summary>
+		/// Finalizes an instance of the AppDomainContext class.
+		/// </summary>
+		~AppDomainContext() {
+			onDispose(false);
+		}
+	}
 }

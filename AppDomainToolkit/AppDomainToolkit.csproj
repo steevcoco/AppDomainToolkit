@@ -61,7 +61,7 @@
     <Compile Include="IAssemblyResolver.cs" />
     <Compile Include="IAssemblyTarget.cs" />
     <Compile Include="IAssemblyTargetLoader.cs" />
-    <Compile Include="IDisposable.cs" />
+    <Compile Include="IIsDisposable.cs" />
     <Compile Include="MarshalableTaskCompletionSource.cs" />
     <Compile Include="PathBasedAssemblyResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
