@@ -1,6 +1,15 @@
 AppDomain Toolkit
 =================
 
+CHANGES IN THIS FORK
+--------------------
+
+ - Added ReflectionOnly methods to AppDomainToolkit.LoadMethod.
+ - Refactored IAssemblyTarget to hold the actual AssemblyName object instead of just the (string) FullName.
+ - AppDomainContext Create methods now return IAppDomainContext.
+ - UniqueId is moved to IAppDomainContext.
+
+
 SUMMARY
 -------
 Anyone whose ever had to deal with loading Assemblies using standard .NET reflection facilities understands
