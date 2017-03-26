@@ -180,6 +180,27 @@ namespace AppDomainToolkit.UnitTests
 		}
 
 		[Fact]
+		public void NoRefAssembly_ReflectionOnlyLoadFrom() {
+			AssemblyName reflectionName, loadFromName;
+			using (IAppDomainContext context = AppDomainContext.Create()) {
+				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
+				reflectionName = context.LoadAssembly(LoadMethod.ReflectionOnlyLoadFrom, targetPath)?.AssemblyName;
+				Assert.NotNull(reflectionName);
+			}
+			using (IAppDomainContext context = AppDomainContext.Create()) {
+				string targetPath = Path.GetFullPath(AppDomainContextUnitTests.noRefsAssemblyPath);
+				loadFromName = context.LoadAssembly(LoadMethod.LoadFrom, targetPath)?.AssemblyName;
+				Assert.NotNull(loadFromName);
+			}
+			PropertyInfo[] assemblyNameInfos = typeof(AssemblyName).GetProperties();
+			foreach (PropertyInfo assemblyNameInfo in assemblyNameInfos) {
+				Assert.Equal(
+						assemblyNameInfo.GetValue(reflectionName),
+						assemblyNameInfo.GetValue(loadFromName));
+			}
+		}
+
+		[Fact]
 		public void FindByCodeBase_NullArgument() => Assert.Throws(
 				typeof(ArgumentNullException),
 				() => {
