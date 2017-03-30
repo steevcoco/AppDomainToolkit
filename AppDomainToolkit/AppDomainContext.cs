@@ -130,9 +130,9 @@ namespace AppDomainToolkit
 		/// <summary>
 		/// Initializes a new instance of the AppDomainContext class. The new AppDomainContext will wrap the given domain
 		/// </summary>
-		/// <param name="domain"></param>
+		/// <param name="domain">Not null.</param>
 		private AppDomainContext(AppDomain domain)
-			: this(domain.SetupInformation, (_, __) => domain) {}
+			: this(domain.SetupInformation, (setup, friendlyName) => domain) {}
 
 		private AppDomainContext(AppDomainSetup setupInfo, Func<AppDomainSetup, string, AppDomain> createDomain) {
 			UniqueId = Guid.NewGuid();
