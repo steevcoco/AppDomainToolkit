@@ -66,7 +66,7 @@ namespace AppDomainToolkit
 		/// application domain.
 		/// </remarks>
 		public Assembly LoadAssembly(LoadMethod loadMethod, string assemblyPath, string pdbPath = null) {
-			Assembly assembly = null;
+			Assembly assembly;
 			switch (loadMethod) {
 				case LoadMethod.LoadFrom:
 					assembly = Assembly.LoadFrom(assemblyPath);
@@ -82,11 +82,11 @@ namespace AppDomainToolkit
 						: pdbPath;
 
 					// Only load the PDB if it exists--we may be dealing with a release assembly.
-					if (File.Exists(pdbPath))
+					if (File.Exists(pdbPath)) {
 						assembly = Assembly.Load(
 								File.ReadAllBytes(assemblyPath),
 								File.ReadAllBytes(pdbPath));
-					else
+					} else
 						assembly = Assembly.Load(File.ReadAllBytes(assemblyPath));
 
 					break;
