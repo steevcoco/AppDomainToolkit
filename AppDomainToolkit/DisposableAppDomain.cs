@@ -21,9 +21,7 @@ namespace AppDomainToolkit
 		/// The domain to wrap.
 		/// </param>
 		public DisposableAppDomain(AppDomain domain) {
-			if (domain == null)
-				throw new ArgumentNullException(nameof(domain));
-			this.domain = domain;
+			this.domain = domain ?? throw new ArgumentNullException(nameof(domain));
 			IsDisposed = false;
 		}
 
