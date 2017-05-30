@@ -267,8 +267,10 @@ namespace AppDomainToolkit
 
 
 		/// <inheritdoc />
-		public void Dispose()
-			=> onDispose(true);
+		public void Dispose() {
+			GC.SuppressFinalize(this);
+			onDispose(true);
+		}
 
 		private void onDispose(bool disposing) {
 			if (disposing) {
@@ -278,7 +280,6 @@ namespace AppDomainToolkit
 					if (!loaderProxy.IsDisposed)
 						loaderProxy.Dispose();
 					AssemblyImporter = null;
-					GC.SuppressFinalize(this);
 				}
 			}
 			IsDisposed = true;

@@ -42,8 +42,10 @@ namespace AppDomainToolkit
 
 
 		/// <inheritdoc />
-		public void Dispose()
-			=> onDispose(true);
+		public void Dispose() {
+			GC.SuppressFinalize(this);
+			onDispose(true);
+		}
 
 		/// <summary>
 		/// Should be called when the object is being disposed.
@@ -59,7 +61,6 @@ namespace AppDomainToolkit
 						AppDomain.Unload(Domain);
 					domain = null;
 				}
-				GC.SuppressFinalize(this);
 			}
 			IsDisposed = true;
 		}

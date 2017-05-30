@@ -107,8 +107,10 @@ namespace AppDomainToolkit
 		public bool IsDisposed { get; private set; }
 
 		/// <inheritdoc />
-		public void Dispose()
-			=> onDispose(true);
+		public void Dispose() {
+			GC.SuppressFinalize(this);
+			onDispose(true);
+		}
 
 		/// <summary>
 		/// Should be called when the object is being disposed.
@@ -123,7 +125,6 @@ namespace AppDomainToolkit
 						wrappedDomain.Dispose();
 					remoteObject = null;
 				}
-				GC.SuppressFinalize(this);
 			}
 			IsDisposed = true;
 		}
