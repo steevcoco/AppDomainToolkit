@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 // Versioning
 
-[assembly: AssemblyVersion("1.1.4.1")]
+[assembly: AssemblyVersion("1.1.4.2")]
 
 // Unit tests.
 
