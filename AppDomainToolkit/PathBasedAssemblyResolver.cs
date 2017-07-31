@@ -59,7 +59,7 @@ namespace AppDomainToolkit
 
 		/// <inheritdoc />
 		public string ApplicationBase {
-			get { return applicationBase; }
+			get => applicationBase;
 			set {
 				applicationBase = value;
 				AddProbePath(value);
@@ -68,7 +68,7 @@ namespace AppDomainToolkit
 
 		/// <inheritdoc />
 		public string PrivateBinPath {
-			get { return privateBinPath; }
+			get => privateBinPath;
 			set {
 				privateBinPath = value;
 				AddProbePath(value);

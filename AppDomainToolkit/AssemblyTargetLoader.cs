@@ -23,9 +23,8 @@ namespace AppDomainToolkit
 		/// Initializes a new instance of the RemotableAssemblyLoader class. This parameterless ctor is
 		/// required for remoting.
 		/// </summary>
-		public AssemblyTargetLoader() {
-			loader = new AssemblyLoader();
-		}
+		public AssemblyTargetLoader()
+			=> loader = new AssemblyLoader();
 
 
 		/// <inheritdoc />
