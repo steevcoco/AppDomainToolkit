@@ -20,11 +20,9 @@ namespace AppDomainToolkit
 	{
 		private readonly IAssemblyLoader loader;
 		private readonly HashSet<string> probePaths;
-
-		/// <inheritdoc />
+		
 		private string applicationBase;
-
-		/// <inheritdoc />
+		
 		private string privateBinPath;
 
 

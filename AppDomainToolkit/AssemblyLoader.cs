@@ -66,6 +66,8 @@ namespace AppDomainToolkit
 		/// application domain.
 		/// </remarks>
 		public Assembly LoadAssembly(LoadMethod loadMethod, string assemblyPath, string pdbPath = null) {
+			if (string.IsNullOrWhiteSpace(assemblyPath))
+				throw new ArgumentNullException(nameof(assemblyPath));
 			Assembly assembly;
 			switch (loadMethod) {
 				case LoadMethod.LoadFrom:
