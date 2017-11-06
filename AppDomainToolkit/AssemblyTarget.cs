@@ -11,7 +11,8 @@ namespace AppDomainToolkit
 	/// strings anyway.
 	/// </summary>
 	[Serializable]
-	public sealed class AssemblyTarget : IAssemblyTarget
+	public sealed class AssemblyTarget
+			: IAssemblyTarget
 	{
 		/// <summary>
 		/// Creates a new AssemblyTarget from the target assembly.
@@ -51,7 +52,8 @@ namespace AppDomainToolkit
 				throw new ArgumentNullException(nameof(codebase), "Codebase URI cannot be null!");
 			if (!File.Exists(codebase.LocalPath))
 				throw new FileNotFoundException("The target location must be an existing file!");
-			if (!string.IsNullOrEmpty(location) && !File.Exists(location))
+			if (!string.IsNullOrEmpty(location)
+					&& !File.Exists(location))
 				throw new FileNotFoundException("The target location must be an existing file!");
 			return new AssemblyTarget {
 				CodeBase = codebase,
@@ -85,7 +87,7 @@ namespace AppDomainToolkit
 		/// <summary>
 		/// Prevents a default instance of the AssemblyTarget class from being created.
 		/// </summary>
-		private AssemblyTarget() {}
+		private AssemblyTarget() { }
 
 
 		/// <inheritdoc />

@@ -6,7 +6,8 @@ namespace AppDomainToolkit
 	/// <summary>
 	/// Executes an action in another application domain.
 	/// </summary>
-	public class RemoteAction : MarshalByRefObject
+	public class RemoteAction
+			: MarshalByRefObject
 	{
 		/// <summary>
 		/// Invokes an action remotely.

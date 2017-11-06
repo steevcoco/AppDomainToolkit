@@ -14,7 +14,9 @@ namespace AppDomainToolkit
 	/// domain and the default one. This class is simply a wrapper around an assembly loader that translates
 	/// Assembly to AssemblyTarget instances before shipping them back to the parent domain.
 	/// </summary>
-	public class AssemblyTargetLoader : MarshalByRefObject, IAssemblyTargetLoader
+	public class AssemblyTargetLoader
+			: MarshalByRefObject,
+					IAssemblyTargetLoader
 	{
 		private readonly IAssemblyLoader loader;
 
@@ -32,7 +34,8 @@ namespace AppDomainToolkit
 			IAssemblyTarget target;
 			Assembly assembly = loader.LoadAssembly(loadMethod, assemblyPath, pdbPath);
 			if (loadMethod == LoadMethod.LoadBits) {
-				// Assemlies loaded by bits will have the codebase set to the assembly that loaded it. Set it to the correct path here.
+				// Assemlies loaded by bits will have the codebase set to the assembly that loaded it.
+				// Set it to the correct path here.
 				Uri codebaseUri = new Uri(assemblyPath);
 				target = AssemblyTarget.FromPath(codebaseUri, assembly.Location, assembly.GetName());
 			} else

@@ -8,7 +8,8 @@ namespace AppDomainToolkit
 	/// Marshalable <see cref="TaskCompletionSource{TResult}"/>.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class MarshalableTaskCompletionSource<T> : MarshalByRefObject
+	public class MarshalableTaskCompletionSource<T>
+			: MarshalByRefObject
 	{
 		private readonly TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
 

@@ -11,7 +11,9 @@ namespace AppDomainToolkit
 	/// <typeparam name="T">
 	/// The type of object to import. Must be a deriviative of MarshalByRefObject.
 	/// </typeparam>
-	public sealed class Remote<T> : IIsDisposable where T : MarshalByRefObject
+	public sealed class Remote<T>
+			: IIsDisposable
+		where T : MarshalByRefObject
 	{
 		/// <summary>
 		/// Creates a new Remote object.

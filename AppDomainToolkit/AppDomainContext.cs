@@ -48,7 +48,8 @@ namespace AppDomainToolkit
 	/// <summary>
 	/// Loads assemblies into the contained application domain.
 	/// </summary>
-	public sealed class AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver> : IAppDomainContext
+	public sealed class AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>
+			: IAppDomainContext
 		where TAssemblyTargetLoader : MarshalByRefObject, IAssemblyTargetLoader, new()
 		where TAssemblyResolver : MarshalByRefObject, IAssemblyResolver, new()
 	{
@@ -71,7 +72,9 @@ namespace AppDomainToolkit
 				ApplicationBase = rootDir,
 				PrivateBinPath = rootDir
 			};
-			return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(setupInfo) { UniqueId = guid };
+			return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(setupInfo) {
+				UniqueId = guid
+			};
 		}
 
 		/// <summary>
@@ -88,10 +91,12 @@ namespace AppDomainToolkit
 				throw new ArgumentNullException(nameof(setupInfo));
 			Guid guid = Guid.NewGuid();
 			setupInfo.ApplicationName
-				= string.IsNullOrEmpty(setupInfo.ApplicationName)
-					? "Temp-Domain-" + guid
-					: setupInfo.ApplicationName;
-			return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(setupInfo) { UniqueId = guid };
+					= string.IsNullOrEmpty(setupInfo.ApplicationName)
+						? "Temp-Domain-" + guid
+						: setupInfo.ApplicationName;
+			return new AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>(setupInfo) {
+				UniqueId = guid
+			};
 		}
 
 		/// <summary>
@@ -125,14 +130,14 @@ namespace AppDomainToolkit
 		/// The setup information.
 		/// </param>
 		private AppDomainContext(AppDomainSetup setupInfo)
-			: this(setupInfo, AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>.createDomain) {}
+			: this(setupInfo, AppDomainContext<TAssemblyTargetLoader, TAssemblyResolver>.createDomain) { }
 
 		/// <summary>
 		/// Initializes a new instance of the AppDomainContext class. The new AppDomainContext will wrap the given domain
 		/// </summary>
 		/// <param name="domain">Not null.</param>
 		private AppDomainContext(AppDomain domain)
-			: this(domain.SetupInformation, (setup, friendlyName) => domain) {}
+			: this(domain.SetupInformation, (setup, friendlyName) => domain) { }
 
 		private AppDomainContext(AppDomainSetup setupInfo, Func<AppDomainSetup, string, AppDomain> createDomain) {
 			UniqueId = Guid.NewGuid();
@@ -155,7 +160,9 @@ namespace AppDomainToolkit
 			RemoteAction.Invoke(
 					wrappedDomain.Domain,
 					resolverProxy.RemoteObject,
-					resolver => { AppDomain.CurrentDomain.AssemblyResolve += resolver.Resolve; });
+					resolver => {
+						AppDomain.CurrentDomain.AssemblyResolve += resolver.Resolve;
+					});
 
 			// Assign proper paths to the remote resolver
 			resolverProxy.RemoteObject.ApplicationBase = setupInfo.ApplicationBase;

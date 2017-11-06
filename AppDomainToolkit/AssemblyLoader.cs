@@ -52,7 +52,9 @@ namespace AppDomainToolkit
 	/// wrapper around the static Assembly.Load* methods, with the main benefit being the ability to load an assembly
 	/// anonymously bitwise. When you load the assembly this way, there won't be any locking of the DLL file.
 	/// </summary>
-	public class AssemblyLoader : MarshalByRefObject, IAssemblyLoader
+	public class AssemblyLoader
+			: MarshalByRefObject,
+					IAssemblyLoader
 	{
 		/// <inheritdoc />
 		/// <remarks>
@@ -70,13 +72,13 @@ namespace AppDomainToolkit
 				throw new ArgumentNullException(nameof(assemblyPath));
 			Assembly assembly;
 			switch (loadMethod) {
-				case LoadMethod.LoadFrom:
+				case LoadMethod.LoadFrom :
 					assembly = Assembly.LoadFrom(assemblyPath);
 					break;
-				case LoadMethod.LoadFile:
+				case LoadMethod.LoadFile :
 					assembly = Assembly.LoadFile(assemblyPath);
 					break;
-				case LoadMethod.LoadBits:
+				case LoadMethod.LoadBits :
 
 					// Attempt to load the PDB bits along with the assembly to avoid image exceptions.
 					pdbPath = string.IsNullOrEmpty(pdbPath)
@@ -92,13 +94,13 @@ namespace AppDomainToolkit
 						assembly = Assembly.Load(File.ReadAllBytes(assemblyPath));
 
 					break;
-				case LoadMethod.ReflectionOnlyLoadFrom:
+				case LoadMethod.ReflectionOnlyLoadFrom :
 					assembly = Assembly.ReflectionOnlyLoadFrom(assemblyPath);
 					break;
-				case LoadMethod.ReflectionOnlyLoad:
+				case LoadMethod.ReflectionOnlyLoad :
 					assembly = Assembly.ReflectionOnlyLoad(assemblyPath);
 					break;
-				default:
+				default :
 					// In case we upadate the enum but forget to update this logic.
 					throw new NotSupportedException("The target load method isn't supported!");
 			}

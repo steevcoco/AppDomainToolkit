@@ -16,13 +16,15 @@ namespace AppDomainToolkit
 	/// assembly files that you wish to load should be added to an instance of this class, and then the Resolve
 	/// method should be assigned to the AssemblyResolve event on the target application domain.
 	/// </summary>
-	public class PathBasedAssemblyResolver : MarshalByRefObject, IAssemblyResolver
+	public class PathBasedAssemblyResolver
+			: MarshalByRefObject,
+					IAssemblyResolver
 	{
 		private readonly IAssemblyLoader loader;
 		private readonly HashSet<string> probePaths;
-		
+
 		private string applicationBase;
-		
+
 		private string privateBinPath;
 
 
@@ -30,7 +32,7 @@ namespace AppDomainToolkit
 		/// Initializes a new instance of the PathBasedAssemblyResolver class. Exists for MarshalByRefObject
 		/// remoting into app domains.
 		/// </summary>
-		public PathBasedAssemblyResolver() : this(null) {}
+		public PathBasedAssemblyResolver() : this(null) { }
 
 		/// <summary>
 		/// Initializes a new instance of the AssemblyResolver class. A default instance of this class will resolve
@@ -79,7 +81,7 @@ namespace AppDomainToolkit
 			if (string.IsNullOrEmpty(path))
 				return;
 			if (path.Contains(";")) {
-				string[] paths = path.Split(new[] {";"}, StringSplitOptions.RemoveEmptyEntries);
+				string[] paths = path.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 				AddProbePaths(paths);
 			} else
 				AddProbePaths(path);
@@ -120,7 +122,7 @@ namespace AppDomainToolkit
 			if (string.IsNullOrEmpty(path))
 				return;
 			if (path.Contains(";")) {
-				string[] paths = path.Split(new[] {";"}, StringSplitOptions.RemoveEmptyEntries);
+				string[] paths = path.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 				RemoveProbePaths(paths);
 			} else
 				RemoveProbePaths(path);

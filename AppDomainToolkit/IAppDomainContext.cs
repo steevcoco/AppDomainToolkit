@@ -7,7 +7,8 @@ namespace AppDomainToolkit
 	/// <summary>
 	/// Defines behavior for implementations that load assemblies into a built-in application domain.
 	/// </summary>
-	public interface IAppDomainContext : IIsDisposable
+	public interface IAppDomainContext
+			: IIsDisposable
 	{
 		/// <summary>
 		/// Gets a unique ID assigned to the environment. Useful for dictionary keys.

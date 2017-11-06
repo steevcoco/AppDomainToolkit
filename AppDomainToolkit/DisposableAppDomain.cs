@@ -9,7 +9,8 @@ namespace AppDomainToolkit
 	/// current application domain is passed to this class, a call to Dispose will do nothing. We will
 	/// never unload the current application domain.
 	/// </summary>
-	internal sealed class DisposableAppDomain : IIsDisposable
+	internal sealed class DisposableAppDomain
+			: IIsDisposable
 	{
 		private AppDomain domain;
 
@@ -35,7 +36,7 @@ namespace AppDomainToolkit
 				return domain;
 			}
 		}
-		
+
 
 		/// <inheritdoc />
 		public bool IsDisposed { get; private set; }
